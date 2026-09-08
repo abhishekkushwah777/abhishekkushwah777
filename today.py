@@ -72,24 +72,32 @@ def graph_commits(start_date, end_date):
 
 def graph_repos_stars(count_type, owner_affiliation, cursor=None, add_loc=0, del_loc=0):
     """
-    Uses GitHub's GraphQL v4 API to return my total repository, star, or lines of code count.
+    Uses GitHub's GraphQL v4 API to return repository or star count.
     """
     query_count('graph_repos_stars')
+
     query = '''
     query ($owner_affiliation: [RepositoryAffiliation], $login: String!, $cursor: String) {
         user(login: $login) {
-            repositories(first: 100, after: $cursor, ownerAffiliations: $owner_affiliation) {
+            repositories(
+                first: 100,
+                after: $cursor,
+                ownerAffiliations: $owner_affiliation
+            ) {
                 totalCount
+
                 edges {
                     node {
                         ... on Repository {
                             nameWithOwner
+
                             stargazers {
                                 totalCount
                             }
                         }
                     }
                 }
+
                 pageInfo {
                     endCursor
                     hasNextPage
@@ -97,13 +105,26 @@ def graph_repos_stars(count_type, owner_affiliation, cursor=None, add_loc=0, del
             }
         }
     }'''
-    variables = {'owner_affiliation': owner_affiliation, 'login': USER_NAME, 'cursor': cursor}
-    request = simple_request(graph_repos_stars.__name__, query, variables)
-    if request.status_code == 200:
-        if count_type == 'repos':
-            return request.json()['data']['user']['repositories']['totalCount']
-        elif count_type == 'stars':
-            return stars_counter(request.json()['data']['user']['repositories']['edges'])
+
+    variables = {
+        'owner_affiliation': owner_affiliation,
+        'login': USER_NAME,
+        'cursor': cursor
+    }
+
+    request = simple_request(
+        graph_repos_stars.__name__,
+        query,
+        variables
+    )
+
+    repositories = request.json()['data']['user']['repositories']
+
+    if count_type == 'repos':
+        return repositories['totalCount']
+
+    elif count_type == 'stars':
+        return stars_counter(repositories['edges'])
 
 
 def recursive_loc(owner, repo_name, data, cache_comment, addition_total=0, deletion_total=0, my_commits=0, cursor=None):
@@ -290,10 +311,17 @@ def force_close_file(data, cache_comment):
 
 def stars_counter(data):
     """
-    Count total stars in repositories owned by me
+    Count total stars in repositories owned by me.
+    Skips repositories that return no repository node.
     """
     total_stars = 0
-    for node in data: total_stars += node['node']['stargazers']['totalCount']
+
+    for edge in data:
+        node = edge.get('node')
+
+        if node is not None:
+            total_stars += node.get('stargazers', {}).get('totalCount', 0)
+
     return total_stars
 
 
