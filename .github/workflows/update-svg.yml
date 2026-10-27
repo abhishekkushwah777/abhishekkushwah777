@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
     paths:
-      - generate_svg.py
+      - generate_svgfix.py
       - details.txt
 
 # Only one run at a time; a newer run waits instead of racing on the commit.
@@ -46,7 +46,7 @@ jobs:
           # PAT stored in Settings > Secrets and variables > Actions.
           # The script reads it as GITHUB_TOKEN.
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: python generate_svg.py
+        run: python generate_svgfix.py
 
       - name: Commit changes
         run: |
