@@ -1,0 +1,61 @@
+name: Update profile SVGs
+
+on:
+  schedule:
+    - cron: "0 0 * * *"      # every day at 00:00 UTC
+  workflow_dispatch:          # lets you run it manually from the Actions tab
+  push:
+    branches: [main]
+    paths:
+      - generate_svg.py
+      - details.txt
+
+# Only one run at a time; a newer run waits instead of racing on the commit.
+concurrency:
+  group: update-svg
+  cancel-in-progress: false
+
+permissions:
+  contents: write             # needed to commit the regenerated SVGs
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Keeps the per-repo lines-of-code cache between runs so only repos
+      # with new commits get recounted. A fresh key is saved on every run.
+      - name: Restore LOC cache
+        uses: actions/cache@v4
+        with:
+          path: .stats_cache.json
+          key: stats-cache-${{ github.run_id }}
+          restore-keys: |
+            stats-cache-
+
+      - name: Generate SVGs
+        env:
+          # PAT stored in Settings > Secrets and variables > Actions.
+          # The script reads it as GITHUB_TOKEN.
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: python generate_svg.py
+
+      - name: Commit changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dark_mode.svg light_mode.svg
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update profile stats [skip ci]"
+            git push
+          fi

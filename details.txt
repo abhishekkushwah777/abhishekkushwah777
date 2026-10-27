@@ -1,0 +1,48 @@
+# ------------------------------------------------------------
+#  Profile card details  (edited by you, read by generate_svg.py)
+#
+#  Format:
+#    [Section Title]      -> starts a new section with a header line
+#    Key = Value          -> one row with dotted leader
+#    Key.Sub = Value      -> nested key (rendered as Key.Sub)
+#    (empty line)         -> blank row
+#    Uptime = @age:YYYY-MM-DD  -> auto-calculated "X years, Y months, Z days"
+#  The [stats] section is special: it draws the GitHub Stats block.
+# ------------------------------------------------------------
+
+[settings]
+username   = abhishekkushwah777
+logo_color = #ff0022
+output_dark  = dark_mode.svg
+output_light = light_mode.svg
+
+[profile]
+OS     = Linux
+Uptime = @age:2005-09-27
+Host   = N/A
+Kernel = Software Engineer
+IDE    = VSCode 1.96.0
+
+Languages.Programming = Python, JavaScript, C++
+Languages.Computer    = HTML, CSS, JSON, LaTeX
+Languages.Real        = English, Hindi
+
+Hobbies.Software = UI/UX Designing, Gaming
+Hobbies.Hardware = Overclocking, Undervolting
+
+[Contact]
+Email.Personal = abhishekkushwah1359@gmail.com
+Email.Other    =  Nope
+Email.Work     = Unemployed
+LinkedIn       = Abhishek_Kushwah
+Discord        = the_abhishek_ll
+
+[stats]
+repos       = 5
+contributed = 5
+stars       = 0
+commits     = 62
+followers   = 4
+loc         = 21,251
+loc_add     = 23,719
+loc_del     = 2,468
