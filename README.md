@@ -1,5 +1,3 @@
-# 👋 Hey, I'm Abhishek Kushwah
-
 <p align="center">
   <picture>
     <source
@@ -17,6 +15,8 @@
     />
   </picture>
 </p>
+
+# 👋 Hey, I'm Abhishek Kushwah
 
 ---
 
